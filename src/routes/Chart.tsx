@@ -21,37 +21,29 @@ const Chart = () => {
   const {coinId} = useOutletContext<ChartProps>();
   const { isLoading, data } = useQuery<IData[]>(["ohlcv", coinId], () => fetchCoinHistory(coinId),
     // {
-    //   refetchInterval: 5000
+    //   refetchInterval: 5000   // api 무료사용 제한 때문에 주석처리
     // }
   );
 
   return (
     <div>{isLoading ? "Loading chart..."
       : <ApexChart
-        type="line"
+        type="candlestick"
         series={[
           {
-            name: "price",
-            data: data?.map((price) => price.close) as number[]
-          }
+            name: coinId,
+            data: data?.map((price) => ({
+              x: new Date(price.time_close), 
+              y: [price.open, price.low, price.high, price.close]
+            })) ?? []   // data가 없으면 빈 배열을 반환
+          }  
         ]}
         options={{
-          theme: { mode: "dark" },
           chart: { height: 300, width: 500, toolbar: { show: false }, background: "transparent" },
-          grid: { show: false },
-          stroke: { curve: "smooth", width: 3 },
-          yaxis: { show: false },
-          xaxis: {
-            labels: { show: false },
-            axisTicks: { show: false },
-            axisBorder: { show: false },
-            categories: data?.map((price) => price.time_close),
-            type: "datetime"
-          },
-          fill: { type: "gradient", gradient: { gradientToColors: ["#00a5cf"], stops: [0, 100] } },
-          colors: ["#7ae582"],
-          tooltip: { y: { formatter: (value) => `$${value.toFixed(2)}`}}
-    }} />}</div>
+          xaxis: { type: "datetime" },
+          theme: { mode: "dark" }
+        }}
+      />}</div>
   )
 }
 

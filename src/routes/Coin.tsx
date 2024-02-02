@@ -27,15 +27,24 @@ const Header = styled.header`
 
 const TitleWrapper = styled.div`
   display: flex;
+  flex-direction: column;
   align-items: center;
-  button {
-    background: none;
-    border: none;
-
-  }
   img {
     width: 40px;
     filter: invert();
+  }
+  button {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 7px 10px;
+    border-radius: 10px;
+    border: none;
+    color: ${props => props.theme.textColor};
+    margin-top: 10px;
+    cursor: pointer;
+    &:hover {
+      background-color: #124e78;
+      transition: all .1s ease-in-out;
+    }
   }
 `;
 
@@ -147,11 +156,11 @@ const Coin = () => {
   const name = location.state;
   const priceMatch = useMatch("/:coinId/price");
   const chartMatch = useMatch("/:coinId/chart");
-  // userId라는 인수의 전달이 필요하기 때문에 함수 형태로 fetch한 것.
+  // coinId라는 인수의 전달이 필요하기 때문에 함수 형태로 fetch한 것.
   const { isLoading: infoLoading, data: infoData } = useQuery<infoData>(["info", coinId], () => fetchCoinInfo(coinId));
   const { isLoading: tickersLoading, data: tickersData } = useQuery<priceData>(["tickers", coinId], () => fetchCoinTickers(coinId),
     // {
-    //   refetchInterval: 5000   // query를 5초마다 refetch
+    //   refetchInterval: 5000   // query를 5초마다 refetch. api 무료사용 제한 때문에 주석처리
     // }
   );
 
@@ -170,13 +179,11 @@ const Coin = () => {
       </Helmet>
       <Header>
         <TitleWrapper>
-          <button onClick={onClick}>
-            <img src="backspace.png" alt="뒤로 가기" />
-          </button>
           <Title>
             {/* 홈페이지에서 coin 개별페이지로 접속하면 name이 뜨거나 로딩, URL을 직접 쳐서 들어오면 로딩 또는 name */}
             {name ? name : loading ? "Loading..." : infoData?.name}  
           </Title>
+          <button onClick={onClick}>코인 목록</button>
         </TitleWrapper>
       </Header>
       {loading ? (
